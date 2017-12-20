@@ -8,14 +8,17 @@ import time
 import requests
 
 print("Initializing driver...")
-browser = webdriver.Firefox()  # executable_path='geckodriver.exe')
+browser = webdriver.Firefox(executable_path='geckodriver.exe')
 #ms4 = 'http://o2tvseries.com/Madam-Secretary-8/Season-04/index.html'
 #got7 = 'http://o2tvseries.com/Game-of-Thrones-8/Season-07/index.html'
-scandal = 'http://o2tvseries.com/Scandal-8/Season-07/index.html'
-root_dir = 'http://d7.o2tvseries.com/Scandal/Season%2007/'
+#scandal = 'http://o2tvseries.com/Scandal-8/Season-07/index.html'
+#root_dir = 'http://d1.o2tvseries.com/Scandal/Season%2007/'
+
+pb = 'http://o2tvseries.com/Prison-Break-8/Season-05/index.html'
+root_dir = 'http://d12.o2tvseries.com/Prison%20Break/Season%2005/'
 
 print("Downloading webpage...")
-browser.get(scandal)
+browser.get(pb)
 elements = browser.find_element_by_class_name(
     'data_list').find_elements_by_xpath("//a[@href]")
 
@@ -25,12 +28,13 @@ for element in elements:
     if 'Episode' in element.get_attribute("href"):
         episodes.append(element.get_attribute("href"))
 episodes.reverse()
+#episodes = episodes[:5]
 print("Found...{}!".format(len(episodes)))
 
 download_list = []
 print("Finding download links...")
 for episode in episodes:
-    per_episode = webdriver.Firefox()  # executable_path='geckodriver.exe')
+    per_episode = webdriver.Firefox(executable_path='geckodriver.exe')
     per_episode.get(episode)
     elem_episodes = per_episode.find_element_by_class_name(
         'data_list').find_elements_by_xpath("//a[@href]")
@@ -46,11 +50,11 @@ for download in download_list:
     print('Downloading episode {0}, {1} remaining...'.format(
         count, len(download_list) - count))
     print("Source:", download)
-    episode = download[-38:].replace('%20', ' ')
+    episode =  "./files/prison-break/" + download[-38:].replace('%20', ' ')
     print('Destination:', episode)
-    print("GET.")
+    print("Fetching bytes...")
     r = requests.get(download, allow_redirects=True)
-    print("WRITE")
+    print("Write bytes...")
     open(episode, 'wb').write(r.content)
     print("Done.")
     count += 1
